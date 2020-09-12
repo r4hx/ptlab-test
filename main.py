@@ -1,13 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 import logging
 import os
 import random
 from datetime import datetime
 
-import cv2
-import numpy as np
 import telebot
 from PIL import Image, ImageDraw, ImageFont
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -41,12 +38,10 @@ def get_random_text(text_file=text_file) -> str:
 
 def write_text_photo(filepath, text) -> None:
     '''draw text to received photo'''
-    image = cv2.imread(filepath)
-    cv2_im_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    pil_im = Image.fromarray(cv2_im_rgb)
-    draw = ImageDraw.Draw(pil_im)
+    image = Image.open(filepath)
+    draw = ImageDraw.Draw(image)
     font = ImageFont.truetype(font_file, size=40, encoding="utf-8")
-    width_image, height_image = pil_im.size
+    width_image, height_image = image.size
     width_text, height_text = draw.textsize(text, font=font)
     draw.text(
         ((width_image - width_text) / 2 + 1, ((height_image / 10) * 9) + 1),
@@ -60,8 +55,7 @@ def write_text_photo(filepath, text) -> None:
         font=font,
         fill=(255, 0, 0, 0)
     )
-    cv2_im_processed = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
-    cv2.imwrite(filepath, cv2_im_processed)
+    image.save(filepath)
 
 
 @bot.message_handler(commands=['start'])
